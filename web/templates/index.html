@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ticket Prices</title>
+    <!-- Import Materialize CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <!-- Import Google Icons -->
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Import Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="center-align">Ticket Prices</h1>
+        <div class="row">
+            <div class="col s12">
+                <canvas id="prices-chart" width="400" height="200"></canvas>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col s12">
+                <table id="prices-table" class="striped">
+                    <thead>
+                        <tr>
+                            <th>Ticket ID</th>
+                            <th>Price</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Import Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script>
+        async function fetchPrices() {
+            const response = await fetch('/prices');
+            const prices = await response.json();
+            return prices;
+        }
+
+        function populateTable(prices) {
+            const tableBody = document.getElementById('prices-table').querySelector('tbody');
+            tableBody.innerHTML = '';
+            for (const [ticketId, price] of Object.entries(prices)) {
+                const row = document.createElement('tr');
+                const ticketIdCell = document.createElement('td');
+                const priceCell = document.createElement('td');
+                ticketIdCell.textContent = ticketId;
+                priceCell.textContent = price;
+                row.appendChild(ticketIdCell);
+                row.appendChild(priceCell);
+                tableBody.appendChild(row);
+            }
+        }
+
+        function renderChart(prices) {
+            const ctx = document.getElementById('prices-chart').getContext('2d');
+            const labels = Object.keys(prices).map(key => key.split(':')[1]);
+            const data = Object.values(prices);
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Price',
+                        data: data,
+                        backgroundColor: 'rgba(75, 192, 192, 0.5)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const prices = await fetchPrices();
+            populateTable(prices);
+            renderChart(prices);
+        });
+    </script>
+</body>
+
+</html>

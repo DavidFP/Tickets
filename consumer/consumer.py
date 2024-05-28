@@ -4,7 +4,8 @@ import json
 import time
 
 # Conexión a Kafka
-consumer = KafkaConsumer('ticket_prices',
+topic = 'ticket_prices'
+consumer = KafkaConsumer(topic,
                          bootstrap_servers='kafka:9092',
                          value_deserializer=lambda m: json.loads(m.decode('utf-8')))
 

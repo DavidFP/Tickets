@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Ticket Prices</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script type="text/javascript" charset="utf-8">
+        $(document).ready(function(){
+            var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+            socket.on('update', function(data) {
+                console.log('Received update:', data);
+                var ticket = Object.keys(data)[0];
+                var price = data[ticket];
+                $('#' + ticket).text(price);
+            });
+        });
+    </script>
+</head>
+<body>
+    <h1>Ticket Prices</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Ticket</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ticket, price in tickets.items() %}
+            <tr>
+                <td>{{ ticket }}</td>
+                <td id="{{ ticket }}">{{ price }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
